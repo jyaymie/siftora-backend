@@ -24,3 +24,6 @@ class Product(models.Model):
     finish_date = models.DateField(null=True, blank=True)
     will_repurchase = models.BooleanField()
     notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'{self.name} by {self.brand}'
