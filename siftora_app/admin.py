@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Bin, Product
 
-# Register your models here.
+admin.site.register(Bin)
+admin.site.register(Product)
