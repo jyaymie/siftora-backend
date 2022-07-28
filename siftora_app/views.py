@@ -1,14 +1,13 @@
-from django.shortcuts import render
 from rest_framework import viewsets
-from .serializers import BinSerializer, ProductSerializer
 from .models import Bin, Product
+from .serializers import BinSerializer, ProductSerializer
 
 
-class BinView(viewsets.ModelViewSet):
+class BinViewSet(viewsets.ModelViewSet):
     serializer_class = BinSerializer
     queryset = Bin.objects.all()
 
 
-class ProductView(viewsets.ModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()

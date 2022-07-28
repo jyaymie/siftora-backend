@@ -13,14 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from siftora_app import views
 
+# Routers provide an easy way of automatically determining the URL conf
+
 router = routers.DefaultRouter()
-router.register(r'bins', views.BinView, 'bin')
-router.register(r'products', views.ProductView, 'product')
+router.register(r'bins', views.BinViewSet)
+router.register(r'products', views.ProductViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

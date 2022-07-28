@@ -1,19 +1,11 @@
 from django.db import models
 
 
-class Bin(models.Model):
-    title = models.CharField(max_length=50)
-    product_count = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f'{self.title} ({self.product_count})'
-
-
 class Product(models.Model):
     brand = models.CharField(max_length=50)
     name = models.CharField(max_length=50)
     shade = models.CharField(max_length=50, blank=True)
-    texture = models.CharField(max_length=50, blank=True)
+    finish = models.CharField(max_length=50, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
     price = models.DecimalField(
@@ -27,3 +19,11 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name} by {self.brand}'
+
+
+class Bin(models.Model):
+    title = models.CharField(max_length=50)
+    products = models.ManyToManyField(Product)
+
+    def __str__(self):
+        return f'{self.title} ({self.product_count})'
