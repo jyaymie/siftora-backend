@@ -34,11 +34,7 @@ DEBUG = True if os.getenv('MODE') == 'dev' else False
 
 ALLOWED_HOSTS = []
 
-CORS_ALLOWED_ORIGINS = [
-    "https://siftora.netlify.app",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
