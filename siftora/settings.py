@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+
+import django_on_heroku
 import os
-import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
@@ -32,6 +33,8 @@ DEBUG = True if os.getenv('MODE') == 'dev' else False
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,7 +51,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,7 +84,10 @@ WSGI_APPLICATION = 'siftora.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'siftora',
+    }
 }
 
 # Password validation
@@ -128,6 +133,4 @@ LOGIN_REDIRECT_URL = '/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
-
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+django_on_heroku.settings(locals())
