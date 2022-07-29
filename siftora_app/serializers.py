@@ -10,8 +10,20 @@ class BinSerializer(serializers.ModelSerializer):
         return bin.products.count()
 
     def get_products(self, bin):
-        print(bin.products)
-        return [str(product) for product in bin.products.all()]
+        return [
+            {'id': product.id,
+             'brand': product.brand,
+             'name': product.name,
+             'shade': product.shade,
+             'finish': product.finish,
+             'purchase_date': product.purchase_date,
+             'price': product.price,
+             'open_date': product.open_date,
+             'expiry_date': product.expiry_date,
+             'use_count': product.use_count,
+             'finish_date': product.finish_date,
+             'will_repurchase': product.will_repurchase,
+             'notes': product.notes} for product in bin.products.all()]
 
     class Meta:
         model = Bin
@@ -20,6 +32,16 @@ class BinSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    bins = serializers.SerializerMethodField('get_bins')
+
+    def get_bins(self, product):
+        return [
+            {'id': bin.id,
+             'title': bin.title,
+             } for bin in product.bins.all()]
+
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'bins', 'brand',
+                  'name', 'shade', 'finish', 'purchase_date',
+                  'price', 'open_date', 'expiry_date', 'use_count', 'finish_date', 'will_repurchase', 'notes']

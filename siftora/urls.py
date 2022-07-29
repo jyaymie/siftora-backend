@@ -16,14 +16,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
 from siftora_app import views
+from rest_framework.routers import DefaultRouter
 
-# Routers provide an easy way of automatically determining the URL conf
-
-router = routers.DefaultRouter()
-router.register(r'bins', views.BinViewSet)
-router.register(r'products', views.ProductViewSet)
+router = DefaultRouter()
+router.register(r'bins', views.BinViewSet, basename='bin')
+router.register(r'products', views.ProductViewSet, basename='product')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
