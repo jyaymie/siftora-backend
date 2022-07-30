@@ -23,9 +23,9 @@ class Product(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True)
     open_date = models.DateField(null=True, blank=True)
     expiry_date = models.DateField(null=True, blank=True)
-    use_count = models.PositiveIntegerField(null=True, blank=True)
+    use_count = models.PositiveIntegerField(default=0)
     finish_date = models.DateField(null=True, blank=True)
-    will_repurchase = models.BooleanField()
+    will_repurchase = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
 
     class Meta:

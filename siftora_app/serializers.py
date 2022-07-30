@@ -2,14 +2,20 @@ from rest_framework import serializers
 from .models import Bin, Product
 
 
-class BinSerializer(serializers.ModelSerializer):
-    product_count = serializers.SerializerMethodField('get_product_count')
-    products = serializers.SerializerMethodField('get_products')
+class BinsSerializerField(serializers.Field):
+    def to_representation(self, obj):
+        return [
+            {
+                'id': bin.id,
+                'title': bin.title,
+            } for bin in obj.all()]
 
-    def get_product_count(self, bin):
-        return bin.products.count()
+    def to_internal_value(self, data):
+        return [item["id"] for item in data]
 
-    def get_products(self, bin):
+
+class ProductsSerializerField(serializers.Field):
+    def to_representation(self, obj):
         return [
             {'id': product.id,
              'brand': product.brand,
@@ -23,7 +29,18 @@ class BinSerializer(serializers.ModelSerializer):
              'use_count': product.use_count,
              'finish_date': product.finish_date,
              'will_repurchase': product.will_repurchase,
-             'notes': product.notes} for product in bin.products.all()]
+             'notes': product.notes} for product in obj.all()]
+
+    def to_internal_value(self, data):
+        return [item["id"] for item in data]
+
+
+class BinSerializer(serializers.ModelSerializer):
+    product_count = serializers.SerializerMethodField('get_product_count')
+    products = ProductsSerializerField()
+
+    def get_product_count(self, bin):
+        return bin.products.count()
 
     class Meta:
         model = Bin
@@ -32,13 +49,7 @@ class BinSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    bins = serializers.SerializerMethodField('get_bins')
-
-    def get_bins(self, product):
-        return [
-            {'id': bin.id,
-             'title': bin.title,
-             } for bin in product.bins.all()]
+    bins = BinsSerializerField()
 
     class Meta:
         model = Product

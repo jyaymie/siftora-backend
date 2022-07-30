@@ -91,6 +91,7 @@ WSGI_APPLICATION = 'siftora.wsgi.application'
 #         'NAME': 'siftora',
 #     }
 # }
+
 DATABASES = {
     'default': dj_database_url.config(conn_max_age=600)
 }
@@ -142,10 +143,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.BasicAuthentication',
+#     ],
+#     'DEFAULT_PERMISSIONS_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ]
+# }
