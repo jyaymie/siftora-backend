@@ -1,11 +1,11 @@
 from django.urls import path, include
-from siftora_app.views import (
-    BinListApiView, BinDetailApiView, ProductListApiView, ProductDetailApiView
-)
+from . import views
 
 urlpatterns = [
-    path('api/bins/', BinListApiView.as_view()),
-    path('api/bins/<int:bin_id>/', BinDetailApiView.as_view()),
-    path('api/products/', ProductListApiView.as_view()),
-    path('api/products/<int:product_id>/', ProductDetailApiView.as_view()),
+    path('api/bins/', views.BinListApiView.as_view(), name='bin_list'),
+    path('api/bins/<int:bin_id>/',
+         views.BinDetailApiView.as_view(), name='bin_detail'),
+    path('api/products/', views.ProductListApiView.as_view(), name='product_list'),
+    path('api/products/<int:product_id>/',
+         views.ProductDetailApiView.as_view(), name='product_detail'),
 ]

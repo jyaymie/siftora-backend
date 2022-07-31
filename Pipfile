@@ -12,6 +12,7 @@ dj-database-url = "*"
 gunicorn = "*"
 django-on-heroku = "*"
 python-dotenv = "*"
+django-rest-auth = "*"
 
 [dev-packages]
 
