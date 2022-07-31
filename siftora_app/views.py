@@ -16,7 +16,7 @@ class BinListApiView(APIView):
     def post(self, request, *args, **kwargs):
         data = {
             'title': request.data.get('title'),
-            'products': request.data.get('products'),
+            'products': request.data.get('products', []),
         }
 
         serializer = BinSerializer(data=data)
@@ -76,7 +76,7 @@ class BinDetailApiView(APIView):
         bin_instance.delete()
         return Response(
             {"res": "Object deleted!"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_204_NO_CONTENT
         )
 
 
@@ -90,6 +90,7 @@ class ProductListApiView(APIView):
     # ========================================================= CREATE A PRODUCT
     def post(self, request, *args, **kwargs):
         data = {
+            'bins': request.data.get('bins', []),
             'brand': request.data.get('brand'),
             'name': request.data.get('name'),
             'shade': request.data.get('shade'),
@@ -171,5 +172,5 @@ class ProductDetailApiView(APIView):
         product_instance.delete()
         return Response(
             {"res": "Object deleted!"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_204_NO_CONTENT
         )

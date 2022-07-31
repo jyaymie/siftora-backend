@@ -32,7 +32,7 @@ class ProductsSerializerField(serializers.Field):
              'notes': product.notes} for product in obj.all()]
 
     def to_internal_value(self, data):
-        return [item["id"] for item in data]
+        return [item['id'] for item in data]
 
 
 class BinSerializer(serializers.ModelSerializer):
