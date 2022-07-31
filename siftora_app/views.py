@@ -1,16 +1,26 @@
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .models import Bin, Product
 from .serializers import BinSerializer, ProductSerializer
 
 
+class UserApiView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        content = {
+            'user': str(request.user),
+            'auth': str(request.auth),
+        }
+        return Response(content)
+
+
 class BinListApiView(APIView):
-    permission_classes = (IsAuthenticated,)
-
     # ======================================================== RETRIEVE ALL BINS
-
     def get(self, request, *args, **kwargs):
         bins = Bin.objects.all()
         serializer = BinSerializer(bins, many=True)
@@ -31,8 +41,6 @@ class BinListApiView(APIView):
 
 
 class BinDetailApiView(APIView):
-    permission_classes = (IsAuthenticated,)
-
     # ======================================================= RETRIEVE BIN BY ID
     def get_object(self, bin_id):
         try:
@@ -87,8 +95,6 @@ class BinDetailApiView(APIView):
 
 
 class ProductListApiView(APIView):
-    permission_classes = (IsAuthenticated,)
-
     # ==================================================== RETRIEVE ALL PRODUCTS
     def get(self, request, *args, **kwargs):
         products = Product.objects.all()
@@ -121,8 +127,6 @@ class ProductListApiView(APIView):
 
 
 class ProductDetailApiView(APIView):
-    permission_classes = (IsAuthenticated,)
-
     # =================================================== RETRIEVE PRODUCT BY ID
     def get_object(self, product_id):
         try:

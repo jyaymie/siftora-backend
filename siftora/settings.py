@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'rest_framework.authtoken',
     'siftora_app',
 ]
 
@@ -146,6 +145,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
 }
+
+CSRF_TRUSTED_ORIGINS = ['https://siftora.netlify.app/']
