@@ -34,8 +34,6 @@ DEBUG = True if os.getenv('MODE') == 'dev' else False
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ALLOW_ALL_ORIGINS = True
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -145,9 +143,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ]
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://siftora.netlify.app/']
+CORS_ORIGIN_ALLOW_ALL = True

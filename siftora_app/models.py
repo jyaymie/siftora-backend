@@ -7,7 +7,7 @@ class Bin(models.Model):
         'Product', related_name='bins', blank=True)
 
     class Meta:
-        ordering = ['id']
+        ordering = ['title']
 
     def __str__(self):
         return self.title
@@ -29,7 +29,7 @@ class Product(models.Model):
     notes = models.TextField(blank=True)
 
     class Meta:
-        ordering = ['id']
+        ordering = ['brand', 'name']
 
     def __str__(self):
         return f'{self.name} by {self.brand}'

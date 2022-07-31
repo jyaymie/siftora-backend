@@ -1,27 +1,38 @@
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.models import User
+# from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Bin, Product
 from .serializers import BinSerializer, ProductSerializer
 
 
-class UserApiView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+class SignupView(APIView):
 
-    def get(self, request, format=None):
-        content = {
-            'user': str(request.user),
-            'auth': str(request.auth),
+    def post(self, request, format=None):
+        data = {
+            'username': request.data.get('username'),
+            'password': request.data.get('password'),
         }
-        return Response(content)
 
+        user = User.objects.create_user(request.data.get('username'),
+                                        "test@test.com",
+                                        request.data.get('password'))
+
+        return Response(data)
+
+
+# https://blog.logrocket.com/django-rest-framework-create-api/#restful-structure-get-post-put-delete-methods
 
 class BinListApiView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
     # ======================================================== RETRIEVE ALL BINS
     def get(self, request, *args, **kwargs):
+
         bins = Bin.objects.all()
         serializer = BinSerializer(bins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -41,6 +52,9 @@ class BinListApiView(APIView):
 
 
 class BinDetailApiView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
     # ======================================================= RETRIEVE BIN BY ID
     def get_object(self, bin_id):
         try:
@@ -95,6 +109,9 @@ class BinDetailApiView(APIView):
 
 
 class ProductListApiView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
     # ==================================================== RETRIEVE ALL PRODUCTS
     def get(self, request, *args, **kwargs):
         products = Product.objects.all()
@@ -127,6 +144,9 @@ class ProductListApiView(APIView):
 
 
 class ProductDetailApiView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
     # =================================================== RETRIEVE PRODUCT BY ID
     def get_object(self, product_id):
         try:
