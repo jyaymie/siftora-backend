@@ -3,14 +3,24 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-# from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Bin, Product
 from .serializers import BinSerializer, ProductSerializer
 
 
-class SignupView(APIView):
+# Authentication help from https://testdriven.io/blog/django-spa-auth/#django-drf-frontend-served-separately-same-domain
 
+# =============================================================== AUTHENTICATION
+class CSRFView(APIView):
+    def get_csrf(request):
+        response = JsonResponse({'detail': 'CSRF cookie set'})
+        response['X-CSRFToken'] = get_token(request)
+        return response
+
+
+class SignupView(APIView):
     def post(self, request, format=None):
         data = {
             'username': request.data.get('username'),
@@ -18,21 +28,46 @@ class SignupView(APIView):
         }
 
         user = User.objects.create_user(request.data.get('username'),
-                                        "test@test.com",
+                                        'user@email.com',
                                         request.data.get('password'))
 
         return Response(data)
 
 
-# https://blog.logrocket.com/django-rest-framework-create-api/#restful-structure-get-post-put-delete-methods
+class SigninView(APIView):
+    def post(self, request, format=None):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if username is None or password is None:
+            return JsonResponse({'detail': 'Please provide username and password.'}, status=400)
+
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            return JsonResponse({'detail': 'Invalid credentials.'}, status=400)
+
+        login(request, user)
+        return JsonResponse({'detail': 'Successfully logged in.'})
+
+
+class SignoutView(APIView):
+    def post(self, request, format=None):
+        # if not request.user.is_authenticated:
+        #     return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
+        logout(request)
+        return JsonResponse({'detail': 'Successfully logged out.'})
+
+
+# CRUD functionality help from https://blog.logrocket.com/django-rest-framework-create-api/#restful-structure-get-post-put-delete-methods
+
 
 class BinListApiView(APIView):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     # ======================================================== RETRIEVE ALL BINS
     def get(self, request, *args, **kwargs):
-
         bins = Bin.objects.all()
         serializer = BinSerializer(bins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -52,8 +87,8 @@ class BinListApiView(APIView):
 
 
 class BinDetailApiView(APIView):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated=]
 
     # ======================================================= RETRIEVE BIN BY ID
     def get_object(self, bin_id):
@@ -66,19 +101,34 @@ class BinDetailApiView(APIView):
         bin_instance = self.get_object(bin_id)
         if not bin_instance:
             return Response(
-                {"res": "Object with bin id does not exists"},
+                {"res": "Object with bin id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        query_params = request.query_params
+        sort = query_params.get('sort')
+
+        sorted_products = []
+        if sort:
+            sorted_products = bin_instance.products.all().order_by(sort)
+        else:
+            sorted_products = bin_instance.products.all()
+
         serializer = BinSerializer(bin_instance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        data = {
+            **serializer.data,
+            "products": ProductSerializer(sorted_products, many=True).data,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
 
     # ========================================================= UPDATE BIN BY ID
     def put(self, request, bin_id, *args, **kwargs):
         bin_instance = self.get_object(bin_id)
         if not bin_instance:
             return Response(
-                {"res": "Object with bin id does not exists"},
+                {"res": "Object with bin id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         data = {
@@ -98,7 +148,7 @@ class BinDetailApiView(APIView):
         bin_instance = self.get_object(bin_id)
         if not bin_instance:
             return Response(
-                {"res": "Object with bin id does not exists"},
+                {"res": "Object with bin id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         bin_instance.delete()
@@ -109,13 +159,20 @@ class BinDetailApiView(APIView):
 
 
 class ProductListApiView(APIView):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     # ==================================================== RETRIEVE ALL PRODUCTS
     def get(self, request, *args, **kwargs):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
+        query_params = request.query_params
+        sort = query_params.get('sort')
+
+        if sort:
+            queryset = Product.objects.all().order_by(sort)
+        else:
+            queryset = Product.objects.all()
+
+        serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # ========================================================= CREATE A PRODUCT
@@ -144,8 +201,8 @@ class ProductListApiView(APIView):
 
 
 class ProductDetailApiView(APIView):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     # =================================================== RETRIEVE PRODUCT BY ID
     def get_object(self, product_id):
@@ -158,7 +215,7 @@ class ProductDetailApiView(APIView):
         product_instance = self.get_object(product_id)
         if not product_instance:
             return Response(
-                {"res": "Object with product id does not exists"},
+                {"res": "Object with product id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -170,7 +227,7 @@ class ProductDetailApiView(APIView):
         product_instance = self.get_object(product_id)
         if not product_instance:
             return Response(
-                {"res": "Object with product id does not exists"},
+                {"res": "Object with product id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         data = {
@@ -200,7 +257,7 @@ class ProductDetailApiView(APIView):
         product_instance = self.get_object(product_id)
         if not product_instance:
             return Response(
-                {"res": "Object with product id does not exists"},
+                {"res": "Object with product id does not exist"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         product_instance.delete()
@@ -208,3 +265,24 @@ class ProductDetailApiView(APIView):
             {"res": "Object deleted!"},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class SessionView(APIView):
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, format=None):
+        return JsonResponse({'isAuthenticated': True})
+
+
+class WhoAmIView(APIView):
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, format=None):
+        return JsonResponse({
+            'id': request.user.id,
+            'username': request.user.username
+        })

@@ -13,6 +13,7 @@ gunicorn = "*"
 django-on-heroku = "*"
 python-dotenv = "*"
 django-rest-auth = "*"
+djoser = "*"
 
 [dev-packages]
 
