@@ -21,7 +21,6 @@ class ProductsSerializerField(serializers.Field):
              'brand': product.brand,
              'name': product.name,
              'shade': product.shade,
-             'finish': product.finish,
              'purchase_date': product.purchase_date,
              'price': product.price,
              'open_date': product.open_date,
@@ -54,5 +53,5 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'bins', 'brand',
-                  'name', 'shade', 'finish', 'purchase_date',
+                  'name', 'shade', 'purchase_date',
                   'price', 'open_date', 'expiry_date', 'use_count', 'finish_date', 'will_repurchase', 'notes']
