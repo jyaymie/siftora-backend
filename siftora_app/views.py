@@ -1,6 +1,6 @@
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+# from rest_framework.authentication import SessionAuthentication
+# from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -57,6 +57,27 @@ class SignoutView(APIView):
         #     return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
         logout(request)
         return JsonResponse({'detail': 'Successfully logged out.'})
+
+
+class SessionView(APIView):
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, format=None):
+        return JsonResponse({'isAuthenticated': True})
+
+
+class WhoAmIView(APIView):
+    # authentication_classes = [SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request, format=None):
+        return JsonResponse({
+            'id': request.user.id,
+            'username': request.user.username
+        })
 
 
 # CRUD functionality help from https://blog.logrocket.com/django-rest-framework-create-api/#restful-structure-get-post-put-delete-methods
@@ -189,6 +210,7 @@ class ProductListApiView(APIView):
             'use_count': request.data.get('use_count'),
             'finish_date': request.data.get('finish_date'),
             'will_repurchase': request.data.get('will_repurchase'),
+            'image': request.data.get('image'),
             'notes': request.data.get('notes'),
         }
 
@@ -240,6 +262,7 @@ class ProductDetailApiView(APIView):
             'use_count': request.data.get('use_count'),
             'finish_date': request.data.get('finish_date'),
             'will_repurchase': request.data.get('will_repurchase'),
+            'image': request.data.get('image'),
             'notes': request.data.get('notes'),
         }
         serializer = ProductSerializer(
@@ -263,24 +286,3 @@ class ProductDetailApiView(APIView):
             {"res": "Object deleted!"},
             status=status.HTTP_204_NO_CONTENT
         )
-
-
-class SessionView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request, format=None):
-        return JsonResponse({'isAuthenticated': True})
-
-
-class WhoAmIView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request, format=None):
-        return JsonResponse({
-            'id': request.user.id,
-            'username': request.user.username
-        })

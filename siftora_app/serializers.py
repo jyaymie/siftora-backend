@@ -28,6 +28,7 @@ class ProductsSerializerField(serializers.Field):
              'use_count': product.use_count,
              'finish_date': product.finish_date,
              'will_repurchase': product.will_repurchase,
+             'image': product.image,
              'notes': product.notes} for product in obj.all()]
 
     def to_internal_value(self, data):
@@ -54,4 +55,4 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'bins', 'brand',
                   'name', 'shade', 'purchase_date',
-                  'price', 'open_date', 'expiry_date', 'use_count', 'finish_date', 'will_repurchase', 'notes']
+                  'price', 'open_date', 'expiry_date', 'use_count', 'finish_date', 'will_repurchase', 'image', 'notes']

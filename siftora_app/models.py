@@ -25,6 +25,7 @@ class Product(models.Model):
     use_count = models.PositiveIntegerField(default=0)
     finish_date = models.DateField(null=True, blank=True)
     will_repurchase = models.BooleanField(default=False)
+    image = models.URLField(max_length=200, null=True, blank=True)
     notes = models.TextField(blank=True)
 
     class Meta:
