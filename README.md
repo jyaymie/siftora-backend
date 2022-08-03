@@ -4,7 +4,7 @@
 
 This is the backend of the full-stack application, [SIFTORA](https://siftora.netlify.app).
 
-It follows a RESTful architectural style and has full CRUD functionality with two tables, 'bins' and 'products', which have a many-to-many relationship. Here is what you can do with the SIFTORA API:
+It follows a RESTful architectural style and has full CRUD functionality with two tables, 'bins' and 'products', which hold a many-to-many relationship. Here is what you can do with the SIFTORA API:
 
 | HTTP Verb | URL              | Description               |
 | --------- | ---------------- | ------------------------- |
@@ -28,12 +28,12 @@ This API was built using Python and the Django REST framework (DRF), as well as 
 1. In your terminal, check the version of Python running on your machine with `python -v`. If you are not on a version of 3 or greater, run `brew install python3`.
 2. Fork and clone this repository, and change into the new `siftora-backend` directory.
 2. Run `python -m venv env` to create a virtual environment.
-3. Install the required dependencies with `pip install -r requirements.txt`, and apply tables to the database with the following:
+3. Install the required dependencies with `pip install -r requirements.txt`, and apply tables to the database with the following commands:
 ```
 python3 manage.py makemigrations
 python3 manage.py migrate
 ```
-4. Use `python3 manage.py runserver` to start up your Django server, and ta-da! You can now acccess the API service on http://localhost:8000/api. Happy sifting!
+4. Use `python3 manage.py runserver` to start up your Django server, and ta-da! You can now access the API service. Go to http://localhost:8000/api/bins to view the bins. Happy sifting!
 
 ## 🤝 Contribution
 
