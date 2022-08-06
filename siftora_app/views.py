@@ -1,8 +1,9 @@
 from rest_framework import status
-# from rest_framework.authentication import SessionAuthentication
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -10,16 +11,9 @@ from .models import Bin, Product
 from .serializers import BinSerializer, ProductSerializer
 
 
-# Authentication help from https://testdriven.io/blog/django-spa-auth/#django-drf-frontend-served-separately-same-domain
+# Authentication help from https://medium.com/quick-code/token-based-authentication-for-django-rest-framework-44586a9a56fb
 
 # =============================================================== AUTHENTICATION
-class CSRFView(APIView):
-    def get_csrf(request):
-        response = JsonResponse({'detail': 'CSRF cookie set'})
-        response['X-CSRFToken'] = get_token(request)
-        return response
-
-
 class SignupView(APIView):
     def post(self, request, format=None):
         data = {
@@ -35,6 +29,9 @@ class SignupView(APIView):
 
 
 class SigninView(APIView):
+    permission_classes = ()
+    authentication_classes = ()
+
     def post(self, request, format=None):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -45,39 +42,28 @@ class SigninView(APIView):
         user = authenticate(username=username, password=password)
 
         if user is None:
-            return JsonResponse({'detail': 'Invalid credentials.'}, status=400)
+            return JsonResponse({'error': 'Invalid credentials.'}, status=400)
 
-        login(request, user)
-        return JsonResponse({'detail': 'Successfully logged in.'})
+        # Check if user is currently logged in. We need to check this so we
+        # prevent creating a new token with the same user (it will throw a
+        # duplicate error)
+        token, created = Token.objects.get_or_create(user=user)
+
+        return JsonResponse({
+            'detail': 'Successfully logged in.',
+            'token': token.key
+        })
 
 
 class SignoutView(APIView):
+    permission_classes = ()
+    authentication_classes = ()
+
     def post(self, request, format=None):
         # if not request.user.is_authenticated:
         #     return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
         logout(request)
         return JsonResponse({'detail': 'Successfully logged out.'})
-
-
-class SessionView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request, format=None):
-        return JsonResponse({'isAuthenticated': True})
-
-
-class WhoAmIView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request, format=None):
-        return JsonResponse({
-            'id': request.user.id,
-            'username': request.user.username
-        })
 
 
 # CRUD functionality help from https://blog.logrocket.com/django-rest-framework-create-api/#restful-structure-get-post-put-delete-methods
@@ -108,9 +94,6 @@ class BinListApiView(APIView):
 
 
 class BinDetailApiView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated=]
-
     # ======================================================= RETRIEVE BIN BY ID
     def get_object(self, bin_id):
         try:
@@ -180,9 +163,6 @@ class BinDetailApiView(APIView):
 
 
 class ProductListApiView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
     # ==================================================== RETRIEVE ALL PRODUCTS
     def get(self, request, *args, **kwargs):
         query_params = request.query_params
