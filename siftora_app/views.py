@@ -21,6 +21,10 @@ class SignupView(APIView):
             'password': request.data.get('password'),
         }
 
+        # Currently, on sign up, we don't check for user duplicates. Add code below
+        # to check whether a user exists and if so throw an error. Else, continue
+        # to create the user.
+
         user = User.objects.create_user(request.data.get('username'),
                                         'user@email.com',
                                         request.data.get('password'))
@@ -28,7 +32,7 @@ class SignupView(APIView):
         return Response(data)
 
 
-class SigninView(APIView):
+class LoginView(APIView):
     permission_classes = ()
     authentication_classes = ()
 
@@ -44,9 +48,9 @@ class SigninView(APIView):
         if user is None:
             return JsonResponse({'error': 'Invalid credentials.'}, status=400)
 
-        # Check if user is currently logged in. We need to check this so we
-        # prevent creating a new token with the same user (it will throw a
-        # duplicate error)
+        # Check if user is currently logged in to to prevent creating a new
+        # token with the same user, which would otherwise throw a duplicate
+        # error
         token, created = Token.objects.get_or_create(user=user)
 
         return JsonResponse({
