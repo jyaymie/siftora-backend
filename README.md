@@ -2,9 +2,9 @@
 
 ## 💄 Project Description
 
-This is the backend of the full-stack application, [SIFTORA](https://siftora.netlify.app).
+This is the backend of the full-stack application, [Siftora](https://siftora.netlify.app).
 
-It follows a RESTful architectural style and has full CRUD functionality with two tables, 'bins' and 'products', which hold a many-to-many relationship. Here is what you can do with the SIFTORA API:
+It follows a RESTful architectural style and has full CRUD functionality with (currently) two tables, 'bins' and 'products', which hold a many-to-many relationship. Here is what you can do with the Siftora API:
 
 | HTTP Verb | URL              | Description               |
 | --------- | ---------------- | ------------------------- |
@@ -21,13 +21,12 @@ It follows a RESTful architectural style and has full CRUD functionality with tw
 
 ## 👩‍💻 Technologies
 
-This API was built using Python and the Django REST framework (DRF), as well as PostgreSQL (for the database) and Heroku (for deployment).
+This API was built using Python and Django REST Framework (DRF), as well as PostgreSQL (for the database) and Heroku (for deployment).
 
 ## 🛠 Installation
 
-1. In your terminal, check the version of Python running on your machine with `python -v`. If you are not on a version of 3 or greater, run `brew install python3`.
-2. Fork and clone this repository, and change into the new `siftora-backend` directory.
-2. Run `python -m venv env` to create a virtual environment.
+1. Fork and clone this repository, and change into the new `siftora-backend` directory.
+2. Run `python3 -m venv env` to create a virtual environment.
 3. Install the required dependencies with `pip install -r requirements.txt`, and apply tables to the database with the following commands:
 ```
 python3 manage.py makemigrations
@@ -41,4 +40,4 @@ There is always room for improvement! If you have any suggestions, please submit
 
 ##
 
-✨ Thank you for checking out SIFTORA! ✨
+✨ Thank you for checking out Siftora! ✨

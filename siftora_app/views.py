@@ -15,6 +15,9 @@ from .serializers import BinSerializer, ProductSerializer
 
 # =============================================================== AUTHENTICATION
 class SignupView(APIView):
+    permission_classes = ()
+    authentication_classes = ()
+
     def post(self, request, format=None):
         data = {
             'username': request.data.get('username'),
