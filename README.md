@@ -2,7 +2,7 @@
 
 ## 💄 Project Description
 
-This is the backend of the full-stack application, [Siftora](https://siftora.netlify.app).
+This is the backend of the full-stack application, [Siftora](https://github.com/jyaymie/siftora-frontend).
 
 It follows a RESTful architectural style and has full CRUD functionality with (currently) two tables, 'bins' and 'products', which hold a many-to-many relationship. Here is what you can do with the Siftora API:
 
