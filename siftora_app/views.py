@@ -21,10 +21,6 @@ class SignupView(APIView):
             'password': request.data.get('password'),
         }
 
-        # Currently, on sign up, we don't check for user duplicates. Add code below
-        # to check whether a user exists and if so throw an error. Else, continue
-        # to create the user.
-
         user = User.objects.create_user(request.data.get('username'),
                                         'user@email.com',
                                         request.data.get('password'))
@@ -41,7 +37,7 @@ class LoginView(APIView):
         password = request.data.get('password')
 
         if username is None or password is None:
-            return JsonResponse({'detail': 'Please provide username and password.'}, status=400)
+            return JsonResponse({'detail': 'Please provide a username and password.'}, status=400)
 
         user = authenticate(username=username, password=password)
 
@@ -50,33 +46,31 @@ class LoginView(APIView):
 
         # Check if user is currently logged in to to prevent creating a new
         # token with the same user, which would otherwise throw a duplicate
-        # error
+        # error.
         token, created = Token.objects.get_or_create(user=user)
 
         return JsonResponse({
             'detail': 'Successfully logged in.',
             'token': token.key
-        })
+        }, status=200)
 
 
-class SignoutView(APIView):
+class LogoutView(APIView):
     permission_classes = ()
     authentication_classes = ()
 
     def post(self, request, format=None):
-        # if not request.user.is_authenticated:
-        #     return JsonResponse({'detail': 'You\'re not logged in.'}, status=400)
+        token_key = request.META.get(
+            'HTTP_AUTHORIZATION').replace('Token ', '')
+        Token.objects.filter(key=token_key).delete()
         logout(request)
-        return JsonResponse({'detail': 'Successfully logged out.'})
+        return JsonResponse({'detail': 'Successfully logged out.'}, status=200)
 
 
 # CRUD functionality help from https://blog.logrocket.com/django-rest-framework-create-api/#restful-structure-get-post-put-delete-methods
 
-
+# ============================================================== CRUD OPERATIONS
 class BinListApiView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
     # ======================================================== RETRIEVE ALL BINS
     def get(self, request, *args, **kwargs):
         bins = Bin.objects.all()
@@ -156,12 +150,12 @@ class BinDetailApiView(APIView):
         bin_instance = self.get_object(bin_id)
         if not bin_instance:
             return Response(
-                {"res": "Object with bin id does not exist"},
+                {"res": "Object with bin id does not exist."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         bin_instance.delete()
         return Response(
-            {"res": "Object deleted!"},
+            {"res": "Object deleted."},
             status=status.HTTP_204_NO_CONTENT
         )
 
@@ -206,9 +200,6 @@ class ProductListApiView(APIView):
 
 
 class ProductDetailApiView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-
     # =================================================== RETRIEVE PRODUCT BY ID
     def get_object(self, product_id):
         try:
@@ -220,7 +211,7 @@ class ProductDetailApiView(APIView):
         product_instance = self.get_object(product_id)
         if not product_instance:
             return Response(
-                {"res": "Object with product id does not exist"},
+                {"res": "Object with product id does not exist."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -232,7 +223,7 @@ class ProductDetailApiView(APIView):
         product_instance = self.get_object(product_id)
         if not product_instance:
             return Response(
-                {"res": "Object with product id does not exist"},
+                {"res": "Object with product id does not exist."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         data = {
@@ -262,11 +253,11 @@ class ProductDetailApiView(APIView):
         product_instance = self.get_object(product_id)
         if not product_instance:
             return Response(
-                {"res": "Object with product id does not exist"},
+                {"res": "Object with product id does not exist."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         product_instance.delete()
         return Response(
-            {"res": "Object deleted!"},
+            {"res": "Object deleted."},
             status=status.HTTP_204_NO_CONTENT
         )
