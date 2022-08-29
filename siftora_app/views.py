@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Bin, Product
+from .models import Bin, Product, Owner
 from .serializers import BinSerializer, ProductSerializer
 
 
@@ -76,20 +76,31 @@ class LogoutView(APIView):
 class BinListApiView(APIView):
     # ======================================================== RETRIEVE ALL BINS
     def get(self, request, *args, **kwargs):
-        bins = Bin.objects.all()
-        serializer = BinSerializer(bins, many=True)
+        token_key = request.META.get(
+            'HTTP_AUTHORIZATION').replace('Token ', '')
+        token_object = Token.objects.get(key=token_key)
+        user_id = token_object.user_id
+        owner = Owner.objects.get(user_id=user_id)
+        serializer = BinSerializer(owner.owner_bins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # ============================================================= CREATE A BIN
     def post(self, request, *args, **kwargs):
+        token_key = request.META.get(
+            'HTTP_AUTHORIZATION').replace('Token ', '')
+        token_object = Token.objects.get(key=token_key)
+        user_id = token_object.user_id
+        owner = Owner.objects.get(user_id=user_id)
+
         data = {
             'title': request.data.get('title'),
             'products': request.data.get('products', []),
         }
 
         serializer = BinSerializer(data=data)
+
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner=owner)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -166,19 +177,30 @@ class BinDetailApiView(APIView):
 class ProductListApiView(APIView):
     # ==================================================== RETRIEVE ALL PRODUCTS
     def get(self, request, *args, **kwargs):
+        token_key = request.META.get(
+            'HTTP_AUTHORIZATION').replace('Token ', '')
+        token_object = Token.objects.get(key=token_key)
+        user_id = token_object.user_id
+        owner = Owner.objects.get(user_id=user_id)
         query_params = request.query_params
         sort = query_params.get('sort')
 
         if sort:
-            queryset = Product.objects.all().order_by(sort)
+            queryset = owner.owner_products.order_by(sort)
         else:
-            queryset = Product.objects.all()
+            queryset = owner.owner_products
 
         serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # ========================================================= CREATE A PRODUCT
     def post(self, request, *args, **kwargs):
+        token_key = request.META.get(
+            'HTTP_AUTHORIZATION').replace('Token ', '')
+        token_object = Token.objects.get(key=token_key)
+        user_id = token_object.user_id
+        owner = Owner.objects.get(user_id=user_id)
+
         data = {
             'bins': request.data.get('bins', []),
             'brand': request.data.get('brand'),
@@ -197,7 +219,7 @@ class ProductListApiView(APIView):
 
         serializer = ProductSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner=owner)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -243,6 +265,7 @@ class ProductDetailApiView(APIView):
             'image': request.data.get('image'),
             'notes': request.data.get('notes'),
         }
+
         serializer = ProductSerializer(
             instance=product_instance, data=data, partial=True)
 

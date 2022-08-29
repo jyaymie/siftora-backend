@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Bin, Product
+from .models import Bin, Owner, Product
 
 
 class BinsSerializerField(serializers.Field):
@@ -45,7 +45,8 @@ class BinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bin
         fields = ['id', 'title',
-                  'product_count', 'products']
+                  'product_count', 'products', 'owner']
+        read_only_fields = ['owner'] # Not required in the request body
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -55,4 +56,12 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'bins', 'brand',
                   'name', 'shade', 'purchase_date',
-                  'price', 'open_date', 'expiry_date', 'use_count', 'finish_date', 'will_repurchase', 'image', 'notes']
+                  'price', 'open_date', 'expiry_date', 'use_count', 'finish_date', 'will_repurchase', 'image', 'notes', 'owner']
+        read_only_fields = ['owner'] # Not required in the request body
+
+
+class OwnerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Owner
+        fields = ['user', 'owner_bins', 'owner_products']
